@@ -1,0 +1,28 @@
+{
+  "name": "quan-ly-bao-tang-backend",
+  "version": "1.0.0",
+  "description": "Backend API Server cho Hệ thống Quản lý Bảo tàng Văn hóa các Dân tộc Việt Nam Tích hợp AI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "museum",
+    "heritage",
+    "express",
+    "mysql",
+    "ai"
+  ],
+  "author": "Bảo tàng Văn hóa các Dân tộc Việt Nam",
+  "license": "ISC",
+  "dependencies": {
+    "@google/genai": "^2.19.0",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.7"
+  }
+}
