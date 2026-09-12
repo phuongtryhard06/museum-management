@@ -238,6 +238,13 @@ function switchNav(viewId) {
     renderDashboardStats();
   }
 
+  if (viewId === 'viewShiftReport') {
+    const elStaffName = document.getElementById('shiftStaffName');
+    if (elStaffName && typeof currentUser !== 'undefined' && currentUser && currentUser.full_name) {
+      elStaffName.textContent = currentUser.full_name;
+    }
+  }
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
