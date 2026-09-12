@@ -1076,6 +1076,9 @@ function initProvinceSelect() {
   const provSelect = document.getElementById('modalTourProvince');
   if (!provSelect) return;
 
+  // Don't re-render if options are already populated
+  if (provSelect.options.length > 1) return;
+
   const currentVal = provSelect.value;
   provSelect.innerHTML = '<option value="">-- Chọn Tỉnh / Thành phố --</option>';
 
