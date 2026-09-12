@@ -141,7 +141,7 @@
             <div class="stat-card">
               <i class="fa-solid fa-tree stat-icon"></i>
               <div class="stat-number">6</div>
-              <div class="stat-label">Vùng văn hóa ngoài trời</div>
+              <div class="stat-label">Vùng văn hóa</div>
             </div>
             <div class="stat-card">
               <i class="fa-solid fa-qrcode stat-icon"></i>
@@ -338,7 +338,6 @@
               <div><strong>Dân Tộc:</strong> <span id="detailEthno"
                   style="color: var(--primary-gold); font-weight:700;"></span></div>
               <div><strong>Vùng Văn Hóa:</strong> <span id="detailRegion"></span></div>
-              <div><strong>Niên Đại:</strong> <span id="detailEra"></span></div>
               <div><strong>Chất Liệu:</strong> <span id="detailMaterial"></span></div>
               <div><strong>Vị Trí:</strong> <span id="detailLocation"></span></div>
             </div>
@@ -566,7 +565,7 @@
           </select>
 
           <button type="button" class="btn-primary" style="width: auto;" onclick="openArtifactModal()">
-            <i class="fa-solid fa-plus"></i> Thêm Hồ Sơ Hiện Vật (UI-14)
+            <i class="fa-solid fa-plus"></i> Thêm Hồ Sơ Hiện Vật
           </button>
         </div>
 
@@ -1453,7 +1452,7 @@
   <div class="modal-backdrop" id="artifactModal">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 class="modal-title">Tạo / Cập Nhật Hồ Sơ Hiện Vật (UI-14)</h3>
+        <h3 class="modal-title">Tạo / Cập Nhật Hồ Sơ Hiện Vật</h3>
         <button type="button" class="modal-close-btn" onclick="closeArtifactModal()"><i
             class="fa-solid fa-xmark"></i></button>
       </div>
@@ -1477,6 +1476,23 @@
               <input type="text" id="modalArtEthnic" class="form-input no-icon" placeholder="Dân tộc H'Mông" required>
             </div>
             <div class="form-group">
+              <label class="form-label">Nhóm ngôn ngữ</label>
+              <select id="modalArtLanguageGroup" class="form-select no-icon" required>
+                <option value="Việt - Mường">Việt - Mường</option>
+                <option value="Tày - Thái">Tày - Thái</option>
+                <option value="Môn - Khmer">Môn - Khmer</option>
+                <option value="H'Mông - Dao">H'Mông - Dao</option>
+                <option value="Nam Đảo (Austronesian)">Nam Đảo (Austronesian)</option>
+                <option value="Tạng - Miến">Tạng - Miến</option>
+                <option value="Hán">Hán</option>
+                <option value="Kinh - Tày - Thái">Kinh - Tày - Thái</option>
+                <option value="Khác">Khác</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
               <label class="form-label">Vùng văn hóa</label>
               <select id="modalArtRegion" class="form-select no-icon" required>
                 <option value="Vùng núi cao phía Bắc">Vùng núi cao phía Bắc</option>
@@ -1487,7 +1503,6 @@
                 <option value="Vùng Đồng Bằng Nam Bộ">Vùng Đồng Bằng Nam Bộ</option>
               </select>
             </div>
-          </div>
 
           <div class="form-grid-2">
             <div class="form-group">
@@ -1680,6 +1695,21 @@
             <label class="form-label">Tên đoàn / Đơn vị tham quan</label>
             <input type="text" id="modalTourName" class="form-input no-icon"
               placeholder="Trường THPT Chuyên Thái Nguyên" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Tỉnh / Thành phố</label>
+              <select id="modalTourProvince" class="form-select no-icon" onchange="onProvinceChange()" required>
+                <option value="">-- Chọn Tỉnh / Thành phố --</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phường / Xã</label>
+              <select id="modalTourWard" class="form-select no-icon" required>
+                <option value="">-- Chọn Phường / Xã --</option>
+              </select>
+            </div>
           </div>
 
           <div class="form-grid-2">

@@ -138,6 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderRestorationTable(RESTORATION_DATA);
   renderUserTable(USERS_DATA);
   renderDashboardStats();
+  loadVietnamLocations();
   
   const todayStr = new Date().toISOString().split('T')[0];
   const dateInput = document.getElementById('bookingDate');
@@ -290,8 +291,8 @@ function renderCatalog(artifacts) {
         <span class="artifact-ethno-tag">${art.ethnic} • ${art.region}</span>
         <h3 class="artifact-title">${art.title}</h3>
         <div class="artifact-meta">
-          <div><i class="fa-regular fa-clock"></i> Niên đại: ${art.era}</div>
           <div><i class="fa-solid fa-gem"></i> Chất liệu: ${art.material}</div>
+          <div><i class="fa-solid fa-location-dot"></i> Vị trí: ${art.location}</div>
         </div>
         <button type="button" class="artifact-btn" onclick="openArtifactDetail('${art.id}')">
           <i class="fa-solid fa-headphones"></i> Chi Tiết & AI Audio
@@ -349,7 +350,8 @@ function openArtifactDetail(id) {
   document.getElementById('detailCode').textContent = art.code;
   document.getElementById('detailEthno').textContent = art.ethnic;
   document.getElementById('detailRegion').textContent = art.region;
-  document.getElementById('detailEra').textContent = art.era;
+  const elEra = document.getElementById('detailEra');
+  if (elEra) elEra.textContent = art.era || '';
   document.getElementById('detailMaterial').textContent = art.material;
   document.getElementById('detailLocation').textContent = art.location;
   document.getElementById('detailTitle').textContent = art.title;
@@ -502,7 +504,7 @@ function renderInventoryTable(artifacts) {
         <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
           <i class="fa-solid fa-boxes-stacked" style="font-size: 2.5rem; margin-bottom: 0.75rem; color: var(--primary-gold); display: block;"></i>
           <strong>Chưa có hồ sơ hiện vật di sản nào trong kho lưu trữ.</strong>
-          <p style="font-size: 0.85rem; margin-top: 0.25rem;">Nhấn nút "Thêm Hồ Sơ Hiện Vật (UI-14)" phía trên để nhập dữ liệu di sản.</p>
+          <p style="font-size: 0.85rem; margin-top: 0.25rem;">Nhấn nút "Thêm Hồ Sơ Hiện Vật" phía trên để nhập dữ liệu di sản.</p>
         </td>
       </tr>
     `;
@@ -519,7 +521,7 @@ function renderInventoryTable(artifacts) {
         <span class="badge-status ${art.status === 'Nguyên vẹn' ? 'badge-success' : 'badge-warning'}">${art.status}</span>
       </td>
       <td style="display: flex; gap: 0.5rem; align-items: center;">
-        <button type="button" class="btn-secondary btn-sm" onclick="openArtifactModal('${art.id}')"><i class="fa-solid fa-pen"></i> Sửa (UI-14)</button>
+        <button type="button" class="btn-secondary btn-sm" onclick="openArtifactModal('${art.id}')"><i class="fa-solid fa-pen"></i> Sửa</button>
         <button type="button" class="btn-danger btn-sm" onclick="deleteArtifact('${art.id}')"><i class="fa-solid fa-trash-can"></i> Xóa</button>
       </td>
     </tr>
@@ -682,6 +684,9 @@ function openArtifactModal(id = null) {
       document.getElementById('modalArtCode').value = art.code || '';
       document.getElementById('modalArtTitle').value = art.title || '';
       document.getElementById('modalArtEthnic').value = art.ethnic || '';
+      if (document.getElementById('modalArtLanguageGroup')) {
+        document.getElementById('modalArtLanguageGroup').value = art.languageGroup || 'Kinh - Tày - Thái';
+      }
       document.getElementById('modalArtRegion').value = art.region || 'Vùng núi cao phía Bắc';
       document.getElementById('modalArtMaterial').value = art.material || '';
       document.getElementById('modalArtLocation').value = art.location || 'Kho Bảo Quản 1';
@@ -706,6 +711,9 @@ function openArtifactModal(id = null) {
     document.getElementById('modalArtCode').value = nextCode;
     document.getElementById('modalArtTitle').value = '';
     document.getElementById('modalArtEthnic').value = '';
+    if (document.getElementById('modalArtLanguageGroup')) {
+      document.getElementById('modalArtLanguageGroup').value = 'Kinh - Tày - Thái';
+    }
     document.getElementById('modalArtRegion').value = 'Vùng núi cao phía Bắc';
     document.getElementById('modalArtMaterial').value = '';
     document.getElementById('modalArtLocation').value = 'Kho Bảo Quản 1';
@@ -735,6 +743,7 @@ async function handleSaveArtifact(event) {
   const codeInput = document.getElementById('modalArtCode').value.trim();
   const titleInput = document.getElementById('modalArtTitle').value.trim();
   const ethnicInput = document.getElementById('modalArtEthnic').value.trim();
+  const languageGroupInput = document.getElementById('modalArtLanguageGroup') ? document.getElementById('modalArtLanguageGroup').value : 'Kinh - Tày - Thái';
   const regionInput = document.getElementById('modalArtRegion').value;
   const materialInput = document.getElementById('modalArtMaterial').value.trim();
   const locationInput = document.getElementById('modalArtLocation').value;
@@ -742,6 +751,7 @@ async function handleSaveArtifact(event) {
   const code = codeInput || `HV-${String(ARTIFACTS_DATA.length + 1).padStart(3, '0')}`;
   const title = titleInput || 'Hiện vật mới';
   const ethnic = ethnicInput || 'Chưa xác định';
+  const languageGroup = languageGroupInput || 'Kinh - Tày - Thái';
   const region = regionInput || 'Vùng núi cao phía Bắc';
   const material = materialInput || 'Chưa xác định';
   const location = locationInput || 'Kho Bảo Quản 1';
@@ -774,6 +784,7 @@ async function handleSaveArtifact(event) {
     targetArt.code = code;
     targetArt.title = title;
     targetArt.ethnic = ethnic;
+    targetArt.languageGroup = languageGroup;
     targetArt.region = region;
     targetArt.material = material;
     targetArt.location = location;
@@ -1046,9 +1057,71 @@ function handleSaveBorrow(event) {
   showToast(`Đã lập thành công phiếu mượn di sản ${newBorrow.code}!`, 'success');
 }
 
+let VIETNAM_LOCATIONS = {};
+
+// Fetch administrative units (3,321 Wards & 34 Provinces)
+async function loadVietnamLocations() {
+  try {
+    const res = await fetch('vietnam_locations.json');
+    if (res.ok) {
+      VIETNAM_LOCATIONS = await res.json();
+      initProvinceSelect();
+    }
+  } catch (err) {
+    console.warn('Could not load vietnam_locations.json:', err);
+  }
+}
+
+function initProvinceSelect() {
+  const provSelect = document.getElementById('modalTourProvince');
+  if (!provSelect) return;
+
+  const currentVal = provSelect.value;
+  provSelect.innerHTML = '<option value="">-- Chọn Tỉnh / Thành phố --</option>';
+
+  const sortedProvinces = Object.keys(VIETNAM_LOCATIONS).sort((a, b) => a.localeCompare(b, 'vi'));
+  sortedProvinces.forEach(prov => {
+    const opt = document.createElement('option');
+    opt.value = prov;
+    opt.textContent = prov;
+    provSelect.appendChild(opt);
+  });
+
+  if (currentVal && VIETNAM_LOCATIONS[currentVal]) {
+    provSelect.value = currentVal;
+    onProvinceChange();
+  }
+}
+
+function onProvinceChange() {
+  const provSelect = document.getElementById('modalTourProvince');
+  const wardSelect = document.getElementById('modalTourWard');
+  if (!provSelect || !wardSelect) return;
+
+  const selectedProv = provSelect.value;
+  wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
+
+  if (selectedProv && VIETNAM_LOCATIONS[selectedProv]) {
+    const wards = VIETNAM_LOCATIONS[selectedProv];
+    wards.forEach(ward => {
+      const opt = document.createElement('option');
+      opt.value = ward;
+      opt.textContent = ward;
+      wardSelect.appendChild(opt);
+    });
+  }
+}
+
 function openTourModal() {
   const modal = document.getElementById('tourModal');
-  if (modal) modal.classList.add('active');
+  if (modal) {
+    if (Object.keys(VIETNAM_LOCATIONS).length === 0) {
+      loadVietnamLocations();
+    } else {
+      initProvinceSelect();
+    }
+    modal.classList.add('active');
+  }
 }
 
 function closeTourModal() {
@@ -1060,15 +1133,21 @@ function handleSaveTour(event) {
   event.preventDefault();
 
   const tourName = document.getElementById('modalTourName').value.trim();
+  const ward = document.getElementById('modalTourWard') ? document.getElementById('modalTourWard').value.trim() : '';
+  const province = document.getElementById('modalTourProvince') ? document.getElementById('modalTourProvince').value.trim() : '';
   const tourTarget = document.getElementById('modalTourTarget') ? document.getElementById('modalTourTarget').value : 'Du khách';
   const tourSize = document.getElementById('modalTourSize').value;
   const guide = document.getElementById('modalTourGuide').value.trim();
+
+  const fullNameWithLoc = (ward || province) ? `${tourName} (${[ward, province].filter(Boolean).join(', ')})` : tourName;
 
   const randomNum = Math.floor(100 + Math.random() * 900);
   const newTour = {
     id: TOURS_DATA.length + 1,
     code: `#DOAN-${randomNum}`,
-    name: tourName,
+    name: fullNameWithLoc,
+    ward: ward,
+    province: province,
     target: tourTarget,
     size: `${tourSize} Khách`,
     time: 'Hôm nay',
