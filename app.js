@@ -199,9 +199,19 @@ function updateNavigationVisibility(user) {
 }
 
 /**
+ * Helper to close all open modals
+ */
+function closeAllModals() {
+  document.querySelectorAll('.modal-backdrop').forEach(modal => {
+    modal.classList.remove('active');
+  });
+}
+
+/**
  * Switch Navigation views (Trọn bộ UI-01 đến UI-21)
  */
 function switchNav(viewId) {
+  closeAllModals();
   const views = document.querySelectorAll('.screen-view');
   views.forEach(v => v.classList.remove('active'));
 
@@ -673,6 +683,7 @@ function handleAddUrlImage() {
 }
 
 function openArtifactModal(id = null) {
+  closeAllModals();
   editingArtifactId = (id !== null && id !== undefined && id !== '') ? id : null;
   const modal = document.getElementById('artifactModal');
   const fileInput = document.getElementById('modalArtFileInput');
@@ -1117,6 +1128,7 @@ function onProvinceChange() {
 
 function openTourModal() {
   try {
+    closeAllModals();
     const modal = document.getElementById('tourModal');
     if (modal) {
       modal.classList.add('active');
@@ -1128,6 +1140,7 @@ function openTourModal() {
     }
   } catch (e) {
     console.error('Lỗi openTourModal:', e);
+    closeAllModals();
     const modal = document.getElementById('tourModal');
     if (modal) modal.classList.add('active');
   }
