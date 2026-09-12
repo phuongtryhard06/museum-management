@@ -1113,15 +1113,20 @@ function onProvinceChange() {
 }
 
 function openTourModal() {
-  const modal = document.getElementById('tourModal');
-  if (!modal) return;
-
-  modal.classList.add('active');
-
-  if (Object.keys(VIETNAM_LOCATIONS).length === 0) {
-    loadVietnamLocations();
-  } else {
-    initProvinceSelect();
+  try {
+    const modal = document.getElementById('tourModal');
+    if (modal) {
+      modal.classList.add('active');
+    }
+    if (Object.keys(VIETNAM_LOCATIONS).length === 0) {
+      loadVietnamLocations();
+    } else {
+      initProvinceSelect();
+    }
+  } catch (e) {
+    console.error('Lỗi openTourModal:', e);
+    const modal = document.getElementById('tourModal');
+    if (modal) modal.classList.add('active');
   }
 }
 
