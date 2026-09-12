@@ -1114,13 +1114,14 @@ function onProvinceChange() {
 
 function openTourModal() {
   const modal = document.getElementById('tourModal');
-  if (modal) {
-    if (Object.keys(VIETNAM_LOCATIONS).length === 0) {
-      loadVietnamLocations();
-    } else {
-      initProvinceSelect();
-    }
-    modal.classList.add('active');
+  if (!modal) return;
+
+  modal.classList.add('active');
+
+  if (Object.keys(VIETNAM_LOCATIONS).length === 0) {
+    loadVietnamLocations();
+  } else {
+    initProvinceSelect();
   }
 }
 
