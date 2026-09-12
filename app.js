@@ -154,16 +154,27 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Sync with live Node.js REST API Backend for real-time multi-device synchronization
   try {
-    const res = await fetch(`${API_BASE}/artifacts`);
-    if (res.ok) {
-      const result = await res.json();
+    const [resArt, resTour] = await Promise.all([
+      fetch(`${API_BASE}/artifacts`),
+      fetch(`${API_BASE}/tickets/tours`)
+    ]);
+
+    if (resArt.ok) {
+      const result = await resArt.json();
       if (result.success && Array.isArray(result.data) && result.data.length > 0) {
         const backendArtifacts = result.data.map(normalizeArtifact).filter(Boolean);
         if (backendArtifacts.length > 0) {
-          // Strictly synchronize backend list to local data array
           ARTIFACTS_DATA = backendArtifacts;
           localStorage.setItem('baotang_artifacts_data', JSON.stringify(ARTIFACTS_DATA));
         }
+      }
+    }
+
+    if (resTour.ok) {
+      const tourResult = await resTour.json();
+      if (tourResult.success && Array.isArray(tourResult.data) && tourResult.data.length > 0) {
+        TOURS_DATA = tourResult.data;
+        localStorage.setItem('baotang_tours_data', JSON.stringify(TOURS_DATA));
       }
     }
   } catch (apiErr) {
@@ -172,6 +183,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderCatalog(ARTIFACTS_DATA);
   renderInventoryTable(ARTIFACTS_DATA);
+  renderTourTable(TOURS_DATA);
   renderDashboardStats();
 });
 
@@ -1093,6 +1105,16 @@ function handleSaveTour(event) {
 
   TOURS_DATA.unshift(newTour);
   localStorage.setItem('baotang_tours_data', JSON.stringify(TOURS_DATA));
+
+  // Sync to REST API backend for multi-device support
+  try {
+    fetch(`${API_BASE}/tickets/tours`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newTour)
+    }).catch(() => {});
+  } catch (err) {}
+
   renderTourTable(TOURS_DATA);
   closeTourModal();
   showToast(`Đã đăng ký thành công lịch đoàn ${newTour.code}!`, 'success');
@@ -1108,6 +1130,14 @@ function deleteTour(id) {
 
   TOURS_DATA = TOURS_DATA.filter(t => String(t.id) !== String(id) && t.code !== String(id));
   localStorage.setItem('baotang_tours_data', JSON.stringify(TOURS_DATA));
+
+  // Sync DELETE to REST API backend
+  try {
+    fetch(`${API_BASE}/tickets/tours/${id}`, {
+      method: 'DELETE'
+    }).catch(() => {});
+  } catch (err) {}
+
   renderTourTable(TOURS_DATA);
   showToast(`Đã xóa thành công ${tourName}!`, 'info');
 }

@@ -73,4 +73,50 @@ router.post('/scan', verifyToken, authorizeRoles('BANVE', 'ADMIN'), (req, res) =
   });
 });
 
+let TOURS_DB = [];
+
+/**
+ * GET /api/tickets/tours
+ */
+router.get('/tours', (req, res) => {
+  return res.json({ success: true, count: TOURS_DB.length, data: TOURS_DB });
+});
+
+/**
+ * POST /api/tickets/tours
+ */
+router.post('/tours', (req, res) => {
+  const { id, code, name, ward, province, target, size, time, guide, status } = req.body;
+  const newTour = {
+    id: id || Date.now(),
+    code: code || `#DOAN-${Math.floor(100 + Math.random() * 900)}`,
+    name: name || 'Đoàn tham quan',
+    ward: ward || '',
+    province: province || '',
+    target: target || 'Du khách',
+    size: size || '50 Khách',
+    time: time || 'Hôm nay',
+    guide: guide || 'Cán bộ trực',
+    status: status || 'Chờ Đón Tiếp'
+  };
+
+  const idx = TOURS_DB.findIndex(t => String(t.id) === String(newTour.id) || t.code === newTour.code);
+  if (idx !== -1) {
+    TOURS_DB[idx] = newTour;
+  } else {
+    TOURS_DB.unshift(newTour);
+  }
+
+  return res.status(201).json({ success: true, message: 'Lưu lịch đoàn thành công!', data: newTour });
+});
+
+/**
+ * DELETE /api/tickets/tours/:id
+ */
+router.delete('/tours/:id', (req, res) => {
+  const idStr = String(req.params.id);
+  TOURS_DB = TOURS_DB.filter(t => String(t.id) !== idStr && t.code !== idStr);
+  return res.json({ success: true, message: 'Xóa lịch đoàn thành công!' });
+});
+
 module.exports = router;
