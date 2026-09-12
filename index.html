@@ -594,57 +594,7 @@
     <!-- ============================================================
          UI-15: QUẢN LÝ VỊ TRÍ LƯU TRỮ & ĐIỀU CHUYỂN (STORAGE TRANSFER)
          ============================================================ -->
-    <div id="viewStorageTransfer" class="screen-view">
-      <div class="auth-card wide">
 
-        <div class="card-header">
-          <h2 class="card-title">Quản Lý Vị Trí & Luân Chuyển Di Sản</h2>
-          <p class="card-subtitle">Điều chuyển hiện vật giữa các kho bảo quản và khu vực trưng bày trong bảo tàng</p>
-        </div>
-
-        <div class="location-map-grid">
-          <div class="location-box">
-            <h4><i class="fa-solid fa-warehouse" style="color: var(--primary-gold);"></i> Kho Bảo Quản 1 (Hầm A)</h4>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Sức chứa: 4.500 hiện vật • Đang lưu: 3.280 hiện vật
-            </p>
-          </div>
-          <div class="location-box">
-            <h4><i class="fa-solid fa-building-columns" style="color: #0284c7;"></i> Phòng Trưng Bày 1 (Tầng 1)</h4>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Không gian Vùng Việt Bắc & Tây Bắc</p>
-          </div>
-          <div class="location-box">
-            <h4><i class="fa-solid fa-tree" style="color: #059669;"></i> Trưng Bày Ngoài Trời (Khu C)</h4>
-            <p style="font-size: 0.85rem; color: var(--text-muted);">Mô hình kiến trúc Nhà Rông, Nhà Dài</p>
-          </div>
-        </div>
-
-        <div class="table-toolbar">
-          <h3 class="pane-title" style="font-size: 1.1rem; margin: 0;">Lịch Sử Phiếu Điều Chuyển Vị Trí</h3>
-          <button type="button" class="btn-primary" style="width: auto;" onclick="openTransferModal()">
-            <i class="fa-solid fa-truck-ramp-box"></i> Lập Phiếu Điều Chuyển Mới
-          </button>
-        </div>
-
-        <div class="data-table-container">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Mã Phiếu</th>
-                <th>Hiện Vật Điều Chuyển</th>
-                <th>Vị Trí Cũ</th>
-                <th>Vị Trí Mới</th>
-                <th>Cán Bộ Thực Hiện</th>
-                <th>Ngày Điều Chuyển</th>
-              </tr>
-            </thead>
-            <tbody id="transferTableBody">
-              <!-- Rendered dynamically by app.js -->
-            </tbody>
-          </table>
-        </div>
-
-      </div>
-    </div>
 
 
     <!-- ============================================================
@@ -1558,68 +1508,7 @@
     </div>
   </div>
 
-  <!-- Modal Form for Storage Location Transfer (UI-15) -->
-  <div class="modal-backdrop" id="transferModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 class="modal-title">Lập Phiếu Điều Chuyển Vị Trí Hiện Vật</h3>
-        <button type="button" class="modal-close-btn" onclick="closeTransferModal()"><i
-            class="fa-solid fa-xmark"></i></button>
-      </div>
 
-      <form onsubmit="handleSaveTransfer(event)">
-        <div class="modal-body">
-          <div class="form-group">
-            <label class="form-label">Chọn Hiện vật điều chuyển</label>
-            <select id="modalTransferArtifact" class="form-select no-icon" required>
-              <option value="HV-001 - Trang phục Cổ truyền Dân tộc Tày">HV-001 - Trang phục Cổ truyền Dân tộc Tày
-              </option>
-              <option value="HV-002 - Đàn T'rưng Tre Tây Nguyên">HV-002 - Đàn T'rưng Tre Tây Nguyên</option>
-              <option value="HV-003 - Trống Đồng Văn hóa Đông Sơn">HV-003 - Trống Đồng Văn hóa Đông Sơn</option>
-              <option value="HV-004 - Váy Thổ Cẩm H'Mông">HV-004 - Váy Thổ Cẩm H'Mông</option>
-            </select>
-          </div>
-
-          <div class="form-grid-2">
-            <div class="form-group">
-              <label class="form-label">Vị trí hiện tại (Vị trí cũ)</label>
-              <select id="modalTransferOldLoc" class="form-select no-icon" required>
-                <option value="Kho Bảo Quản 1">Kho Bảo Quản 1</option>
-                <option value="Kho Bảo Quản 2">Kho Bảo Quản 2</option>
-                <option value="Phòng Trưng Bày 1">Phòng Trưng Bày 1</option>
-                <option value="Phòng Trưng Bày 2">Phòng Trưng Bày 2</option>
-                <option value="Khu Trưng Bày Ngoài Trời">Khu Trưng Bày Ngoài Trời</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Vị trí điều chuyển đến (Vị trí mới)</label>
-              <select id="modalTransferNewLoc" class="form-select no-icon" required>
-                <option value="Phòng Trưng Bày 1">Phòng Trưng Bày 1</option>
-                <option value="Phòng Trưng Bày 2">Phòng Trưng Bày 2</option>
-                <option value="Kho Bảo Quản 1">Kho Bảo Quản 1</option>
-                <option value="Kho Bảo Quản 2">Kho Bảo Quản 2</option>
-                <option value="Khu Trưng Bày Ngoài Trời">Khu Trưng Bày Ngoài Trời</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Mục đích / Lý do điều chuyển</label>
-            <input type="text" id="modalTransferNote" class="form-input no-icon"
-              placeholder="VD: Đưa hiện vật ra không gian trưng bày chuyên đề..." required>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn-secondary" onclick="closeTransferModal()">Hủy Bỏ</button>
-          <button type="submit" class="btn-primary" style="width: auto;">
-            <i class="fa-solid fa-truck-ramp-box"></i> Xác Nhận Điều Chuyển
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
 
   <!-- Modal Form for Heritage Borrow (UI-16) -->
   <div class="modal-backdrop" id="borrowModal">

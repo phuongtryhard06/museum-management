@@ -74,7 +74,6 @@ router.post('/scan', verifyToken, authorizeRoles('BANVE', 'ADMIN'), (req, res) =
 });
 
 let TOURS_DB = [];
-let TRANSFERS_DB = [];
 let BORROWS_DB = [];
 
 /**
@@ -121,26 +120,7 @@ router.delete('/tours/:id', (req, res) => {
   return res.json({ success: true, message: 'Xóa lịch đoàn thành công!' });
 });
 
-/**
- * GET /api/tickets/transfers
- */
-router.get('/transfers', (req, res) => {
-  return res.json({ success: true, count: TRANSFERS_DB.length, data: TRANSFERS_DB });
-});
 
-/**
- * POST /api/tickets/transfers
- */
-router.post('/transfers', (req, res) => {
-  const item = req.body;
-  const idx = TRANSFERS_DB.findIndex(t => String(t.id) === String(item.id) || t.code === item.code);
-  if (idx !== -1) {
-    TRANSFERS_DB[idx] = item;
-  } else {
-    TRANSFERS_DB.unshift(item);
-  }
-  return res.status(201).json({ success: true, data: item });
-});
 
 /**
  * GET /api/tickets/borrows

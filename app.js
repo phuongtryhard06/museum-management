@@ -63,8 +63,6 @@ let speechSynth = window.speechSynthesis;
 let currentUser = null;
 let posCartTotal = 30000;
 
-let TRANSFERS_DATA = [];
-
 /**
  * Helper to normalize and sanitize artifact objects from LocalStorage or Backend API
  */
@@ -121,10 +119,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (savedTours) {
     try { TOURS_DATA = JSON.parse(savedTours); } catch (e) {}
   }
-  const savedTransfers = localStorage.getItem('baotang_transfers_data');
-  if (savedTransfers) {
-    try { TRANSFERS_DATA = JSON.parse(savedTransfers); } catch (e) {}
-  }
   const savedBorrows = localStorage.getItem('baotang_borrow_data');
   if (savedBorrows) {
     try { BORROW_DATA = JSON.parse(savedBorrows); } catch (e) {}
@@ -132,7 +126,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderCatalog(ARTIFACTS_DATA);
   renderInventoryTable(ARTIFACTS_DATA);
-  renderTransferTable(TRANSFERS_DATA);
   renderBorrowTable(BORROW_DATA);
   renderTourTable(TOURS_DATA);
   renderRestorationTable(RESTORATION_DATA);
@@ -154,10 +147,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Sync with live Node.js REST API Backend for real-time multi-device synchronization
   try {
-    const [resArt, resTour, resTrans, resBorrow] = await Promise.all([
+    const [resArt, resTour, resBorrow] = await Promise.all([
       fetch(`${API_BASE}/artifacts`),
       fetch(`${API_BASE}/tickets/tours`),
-      fetch(`${API_BASE}/tickets/transfers`),
       fetch(`${API_BASE}/tickets/borrows`)
     ]);
 
@@ -180,14 +172,6 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    if (resTrans && resTrans.ok) {
-      const transResult = await resTrans.json();
-      if (transResult.success && Array.isArray(transResult.data) && transResult.data.length > 0) {
-        TRANSFERS_DATA = transResult.data;
-        localStorage.setItem('baotang_transfers_data', JSON.stringify(TRANSFERS_DATA));
-      }
-    }
-
     if (resBorrow && resBorrow.ok) {
       const borrowResult = await resBorrow.json();
       if (borrowResult.success && Array.isArray(borrowResult.data) && borrowResult.data.length > 0) {
@@ -201,7 +185,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   renderCatalog(ARTIFACTS_DATA);
   renderInventoryTable(ARTIFACTS_DATA);
-  renderTransferTable(TRANSFERS_DATA);
   renderBorrowTable(BORROW_DATA);
   renderTourTable(TOURS_DATA);
   renderDashboardStats();
@@ -967,89 +950,6 @@ window.addEventListener('paste', function(e) {
 /**
  * UI-15: Storage Location Transfer Management
  */
-function renderTransferTable(transfers) {
-  const tbody = document.getElementById('transferTableBody');
-  if (!tbody) return;
-
-  if (!transfers || transfers.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
-          <i class="fa-solid fa-truck-ramp-box" style="font-size: 2.5rem; margin-bottom: 0.75rem; color: var(--primary-gold); display: block;"></i>
-          <strong>Chưa có phiếu điều chuyển vị trí nào được lập.</strong>
-          <p style="font-size: 0.85rem; margin-top: 0.25rem;">Nhấn nút "Lập Phiếu Điều Chuyển Mới" phía trên để tạo mới.</p>
-        </td>
-      </tr>
-    `;
-    return;
-  }
-
-  tbody.innerHTML = transfers.map(t => `
-    <tr>
-      <td><strong>${t.code}</strong></td>
-      <td>${t.artifact}</td>
-      <td>${t.oldLoc}</td>
-      <td><strong style="color: var(--primary-gold);">${t.newLoc}</strong></td>
-      <td>${t.staff}</td>
-      <td>${t.date}</td>
-    </tr>
-  `).join('');
-}
-
-function openTransferModal() {
-  const modal = document.getElementById('transferModal');
-  if (modal) modal.classList.add('active');
-}
-
-function closeTransferModal() {
-  const modal = document.getElementById('transferModal');
-  if (modal) modal.classList.remove('active');
-}
-
-function handleSaveTransfer(event) {
-  event.preventDefault();
-
-  const artifact = document.getElementById('modalTransferArtifact').value;
-  const oldLoc = document.getElementById('modalTransferOldLoc').value;
-  const newLoc = document.getElementById('modalTransferNewLoc').value;
-  const note = document.getElementById('modalTransferNote').value.trim();
-
-  if (oldLoc === newLoc) {
-    showToast('Vị trí cũ và vị trí mới không được trùng nhau!', 'error');
-    return;
-  }
-
-  const randomNum = Math.floor(10 + Math.random() * 90);
-  const todayStr = new Date().toLocaleDateString('vi-VN');
-  const staffName = currentUser ? currentUser.fullName : 'Lê Hoàng Nam';
-
-  const newTransfer = {
-    id: TRANSFERS_DATA.length + 1,
-    code: `#DC-2026-0${randomNum}`,
-    artifact: artifact,
-    oldLoc: oldLoc,
-    newLoc: newLoc,
-    staff: staffName,
-    date: todayStr,
-    note: note
-  };
-
-  TRANSFERS_DATA.unshift(newTransfer);
-  localStorage.setItem('baotang_transfers_data', JSON.stringify(TRANSFERS_DATA));
-
-  try {
-    fetch(`${API_BASE}/tickets/transfers`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newTransfer)
-    }).catch(() => {});
-  } catch (e) {}
-
-  renderTransferTable(TRANSFERS_DATA);
-  closeTransferModal();
-  showToast(`Đã lập thành công phiếu điều chuyển vị trí ${newTransfer.code}!`, 'success');
-}
-
 function openBorrowModal() {
   const modal = document.getElementById('borrowModal');
   if (modal) modal.classList.add('active');
