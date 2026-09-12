@@ -154,9 +154,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Sync with live Node.js REST API Backend for real-time multi-device synchronization
   try {
-    const [resArt, resTour] = await Promise.all([
+    const [resArt, resTour, resTrans, resBorrow] = await Promise.all([
       fetch(`${API_BASE}/artifacts`),
-      fetch(`${API_BASE}/tickets/tours`)
+      fetch(`${API_BASE}/tickets/tours`),
+      fetch(`${API_BASE}/tickets/transfers`),
+      fetch(`${API_BASE}/tickets/borrows`)
     ]);
 
     if (resArt.ok) {
@@ -177,12 +179,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('baotang_tours_data', JSON.stringify(TOURS_DATA));
       }
     }
+
+    if (resTrans && resTrans.ok) {
+      const transResult = await resTrans.json();
+      if (transResult.success && Array.isArray(transResult.data) && transResult.data.length > 0) {
+        TRANSFERS_DATA = transResult.data;
+        localStorage.setItem('baotang_transfers_data', JSON.stringify(TRANSFERS_DATA));
+      }
+    }
+
+    if (resBorrow && resBorrow.ok) {
+      const borrowResult = await resBorrow.json();
+      if (borrowResult.success && Array.isArray(borrowResult.data) && borrowResult.data.length > 0) {
+        BORROW_DATA = borrowResult.data;
+        localStorage.setItem('baotang_borrow_data', JSON.stringify(BORROW_DATA));
+      }
+    }
   } catch (apiErr) {
-    console.log('📡 Using local dataset fallback for museum artifacts.');
+    console.log('📡 Using local dataset fallback for museum data.');
   }
 
   renderCatalog(ARTIFACTS_DATA);
   renderInventoryTable(ARTIFACTS_DATA);
+  renderTransferTable(TRANSFERS_DATA);
+  renderBorrowTable(BORROW_DATA);
   renderTourTable(TOURS_DATA);
   renderDashboardStats();
 });
@@ -1016,6 +1036,15 @@ function handleSaveTransfer(event) {
 
   TRANSFERS_DATA.unshift(newTransfer);
   localStorage.setItem('baotang_transfers_data', JSON.stringify(TRANSFERS_DATA));
+
+  try {
+    fetch(`${API_BASE}/tickets/transfers`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newTransfer)
+    }).catch(() => {});
+  } catch (e) {}
+
   renderTransferTable(TRANSFERS_DATA);
   closeTransferModal();
   showToast(`Đã lập thành công phiếu điều chuyển vị trí ${newTransfer.code}!`, 'success');
@@ -1050,6 +1079,15 @@ function handleSaveBorrow(event) {
 
   BORROW_DATA.unshift(newBorrow);
   localStorage.setItem('baotang_borrow_data', JSON.stringify(BORROW_DATA));
+
+  try {
+    fetch(`${API_BASE}/tickets/borrows`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newBorrow)
+    }).catch(() => {});
+  } catch (e) {}
+
   renderBorrowTable(BORROW_DATA);
   closeBorrowModal();
   showToast(`Đã lập thành công phiếu mượn di sản ${newBorrow.code}!`, 'success');

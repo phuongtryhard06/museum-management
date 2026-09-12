@@ -74,6 +74,8 @@ router.post('/scan', verifyToken, authorizeRoles('BANVE', 'ADMIN'), (req, res) =
 });
 
 let TOURS_DB = [];
+let TRANSFERS_DB = [];
+let BORROWS_DB = [];
 
 /**
  * GET /api/tickets/tours
@@ -117,6 +119,48 @@ router.delete('/tours/:id', (req, res) => {
   const idStr = String(req.params.id);
   TOURS_DB = TOURS_DB.filter(t => String(t.id) !== idStr && t.code !== idStr);
   return res.json({ success: true, message: 'Xóa lịch đoàn thành công!' });
+});
+
+/**
+ * GET /api/tickets/transfers
+ */
+router.get('/transfers', (req, res) => {
+  return res.json({ success: true, count: TRANSFERS_DB.length, data: TRANSFERS_DB });
+});
+
+/**
+ * POST /api/tickets/transfers
+ */
+router.post('/transfers', (req, res) => {
+  const item = req.body;
+  const idx = TRANSFERS_DB.findIndex(t => String(t.id) === String(item.id) || t.code === item.code);
+  if (idx !== -1) {
+    TRANSFERS_DB[idx] = item;
+  } else {
+    TRANSFERS_DB.unshift(item);
+  }
+  return res.status(201).json({ success: true, data: item });
+});
+
+/**
+ * GET /api/tickets/borrows
+ */
+router.get('/borrows', (req, res) => {
+  return res.json({ success: true, count: BORROWS_DB.length, data: BORROWS_DB });
+});
+
+/**
+ * POST /api/tickets/borrows
+ */
+router.post('/borrows', (req, res) => {
+  const item = req.body;
+  const idx = BORROWS_DB.findIndex(b => String(b.id) === String(item.id) || b.code === item.code);
+  if (idx !== -1) {
+    BORROWS_DB[idx] = item;
+  } else {
+    BORROWS_DB.unshift(item);
+  }
+  return res.status(201).json({ success: true, data: item });
 });
 
 module.exports = router;
