@@ -160,23 +160,26 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (result.success && Array.isArray(result.data) && result.data.length > 0) {
         const backendArtifacts = result.data.map(normalizeArtifact).filter(Boolean);
         if (backendArtifacts.length > 0) {
-          // Replace or merge live backend data into local memory
+          // Update client data with live backend list
           backendArtifacts.forEach(bArt => {
-            const exists = ARTIFACTS_DATA.some(a => String(a.id) === String(bArt.id) || a.code === bArt.code);
-            if (!exists) {
+            const idx = ARTIFACTS_DATA.findIndex(a => String(a.id) === String(bArt.id) || a.code === bArt.code);
+            if (idx !== -1) {
+              ARTIFACTS_DATA[idx] = bArt;
+            } else {
               ARTIFACTS_DATA.unshift(bArt);
             }
           });
           localStorage.setItem('baotang_artifacts_data', JSON.stringify(ARTIFACTS_DATA));
-          renderCatalog(ARTIFACTS_DATA);
-          renderInventoryTable(ARTIFACTS_DATA);
-          renderDashboardStats();
         }
       }
     }
   } catch (apiErr) {
     console.log('📡 Using local dataset fallback for museum artifacts.');
   }
+
+  renderCatalog(ARTIFACTS_DATA);
+  renderInventoryTable(ARTIFACTS_DATA);
+  renderDashboardStats();
 });
 
 /**
