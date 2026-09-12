@@ -138,7 +138,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   renderRestorationTable(RESTORATION_DATA);
   renderUserTable(USERS_DATA);
   renderDashboardStats();
-  loadVietnamLocations();
   
   const todayStr = new Date().toISOString().split('T')[0];
   const dateInput = document.getElementById('bookingDate');
@@ -199,19 +198,9 @@ function updateNavigationVisibility(user) {
 }
 
 /**
- * Helper to close all open modals
- */
-function closeAllModals() {
-  document.querySelectorAll('.modal-backdrop').forEach(modal => {
-    modal.classList.remove('active');
-  });
-}
-
-/**
  * Switch Navigation views (Trọn bộ UI-01 đến UI-21)
  */
 function switchNav(viewId) {
-  closeAllModals();
   const views = document.querySelectorAll('.screen-view');
   views.forEach(v => v.classList.remove('active'));
 
@@ -683,7 +672,6 @@ function handleAddUrlImage() {
 }
 
 function openArtifactModal(id = null) {
-  closeAllModals();
   editingArtifactId = (id !== null && id !== undefined && id !== '') ? id : null;
   const modal = document.getElementById('artifactModal');
   const fileInput = document.getElementById('modalArtFileInput');
@@ -1068,82 +1056,9 @@ function handleSaveBorrow(event) {
   showToast(`Đã lập thành công phiếu mượn di sản ${newBorrow.code}!`, 'success');
 }
 
-let VIETNAM_LOCATIONS = {};
-
-// Fetch administrative units (3,321 Wards & 34 Provinces)
-async function loadVietnamLocations() {
-  try {
-    const res = await fetch('vietnam_locations.json');
-    if (res.ok) {
-      VIETNAM_LOCATIONS = await res.json();
-      initProvinceSelect();
-    }
-  } catch (err) {
-    console.warn('Could not load vietnam_locations.json:', err);
-  }
-}
-
-function initProvinceSelect() {
-  const provSelect = document.getElementById('modalTourProvince');
-  if (!provSelect) return;
-
-  // Don't re-render if options are already populated
-  if (provSelect.options.length > 1) return;
-
-  const currentVal = provSelect.value;
-  provSelect.innerHTML = '<option value="">-- Chọn Tỉnh / Thành phố --</option>';
-
-  const sortedProvinces = Object.keys(VIETNAM_LOCATIONS).sort((a, b) => a.localeCompare(b, 'vi'));
-  sortedProvinces.forEach(prov => {
-    const opt = document.createElement('option');
-    opt.value = prov;
-    opt.textContent = prov;
-    provSelect.appendChild(opt);
-  });
-
-  if (currentVal && VIETNAM_LOCATIONS[currentVal]) {
-    provSelect.value = currentVal;
-    onProvinceChange();
-  }
-}
-
-function onProvinceChange() {
-  const provSelect = document.getElementById('modalTourProvince');
-  const wardSelect = document.getElementById('modalTourWard');
-  if (!provSelect || !wardSelect) return;
-
-  const selectedProv = provSelect.value;
-  wardSelect.innerHTML = '<option value="">-- Chọn Phường / Xã --</option>';
-
-  if (selectedProv && VIETNAM_LOCATIONS[selectedProv]) {
-    const wards = VIETNAM_LOCATIONS[selectedProv];
-    wards.forEach(ward => {
-      const opt = document.createElement('option');
-      opt.value = ward;
-      opt.textContent = ward;
-      wardSelect.appendChild(opt);
-    });
-  }
-}
-
 function openTourModal() {
-  try {
-    closeAllModals();
-    const modal = document.getElementById('tourModal');
-    if (modal) {
-      modal.classList.add('active');
-    }
-    if (Object.keys(VIETNAM_LOCATIONS).length === 0) {
-      loadVietnamLocations();
-    } else {
-      initProvinceSelect();
-    }
-  } catch (e) {
-    console.error('Lỗi openTourModal:', e);
-    closeAllModals();
-    const modal = document.getElementById('tourModal');
-    if (modal) modal.classList.add('active');
-  }
+  const modal = document.getElementById('tourModal');
+  if (modal) modal.classList.add('active');
 }
 
 function closeTourModal() {
