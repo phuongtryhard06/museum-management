@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   updateNavigationVisibility(currentUser);
 
-  // Sync with live Node.js REST API Backend first for multi-device synchronization
+  // Sync with live Node.js REST API Backend for real-time multi-device synchronization
   try {
     const res = await fetch(`${API_BASE}/artifacts`);
     if (res.ok) {
@@ -160,15 +160,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (result.success && Array.isArray(result.data) && result.data.length > 0) {
         const backendArtifacts = result.data.map(normalizeArtifact).filter(Boolean);
         if (backendArtifacts.length > 0) {
-          // Update client data with live backend list
-          backendArtifacts.forEach(bArt => {
-            const idx = ARTIFACTS_DATA.findIndex(a => String(a.id) === String(bArt.id) || a.code === bArt.code);
-            if (idx !== -1) {
-              ARTIFACTS_DATA[idx] = bArt;
-            } else {
-              ARTIFACTS_DATA.unshift(bArt);
-            }
-          });
+          // Strictly synchronize backend list to local data array
+          ARTIFACTS_DATA = backendArtifacts;
           localStorage.setItem('baotang_artifacts_data', JSON.stringify(ARTIFACTS_DATA));
         }
       }
