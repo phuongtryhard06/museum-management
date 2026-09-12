@@ -1049,7 +1049,19 @@ function handleSaveBorrow(event) {
 
 function openTourModal() {
   const modal = document.getElementById('tourModal');
-  if (modal) modal.classList.add('active');
+  if (modal) {
+    const elName = document.getElementById('modalTourName');
+    const elWard = document.getElementById('modalTourWard');
+    const elProv = document.getElementById('modalTourProvince');
+    const elSize = document.getElementById('modalTourSize');
+    const elGuide = document.getElementById('modalTourGuide');
+    if (elName) elName.value = '';
+    if (elWard) elWard.value = '';
+    if (elProv) elProv.value = '';
+    if (elSize) elSize.value = '';
+    if (elGuide) elGuide.value = '';
+    modal.classList.add('active');
+  }
 }
 
 function closeTourModal() {
@@ -1061,15 +1073,21 @@ function handleSaveTour(event) {
   event.preventDefault();
 
   const tourName = document.getElementById('modalTourName').value.trim();
+  const ward = document.getElementById('modalTourWard') ? document.getElementById('modalTourWard').value.trim() : '';
+  const province = document.getElementById('modalTourProvince') ? document.getElementById('modalTourProvince').value.trim() : '';
   const tourTarget = document.getElementById('modalTourTarget') ? document.getElementById('modalTourTarget').value : 'Du khách';
   const tourSize = document.getElementById('modalTourSize').value;
   const guide = document.getElementById('modalTourGuide').value.trim();
 
+  const fullNameWithLoc = (ward || province) ? `${tourName} (${[ward, province].filter(Boolean).join(', ')})` : tourName;
+
   const randomNum = Math.floor(100 + Math.random() * 900);
   const newTour = {
-    id: TOURS_DATA.length + 1,
+    id: Date.now(),
     code: `#DOAN-${randomNum}`,
-    name: tourName,
+    name: fullNameWithLoc,
+    ward: ward,
+    province: province,
     target: tourTarget,
     size: `${tourSize} Khách`,
     time: 'Hôm nay',
@@ -1084,6 +1102,20 @@ function handleSaveTour(event) {
   showToast(`Đã đăng ký thành công lịch đoàn ${newTour.code}!`, 'success');
 }
 
+function deleteTour(id) {
+  const tour = TOURS_DATA.find(t => String(t.id) === String(id) || t.code === String(id));
+  const tourName = tour ? `${tour.code} - ${tour.name}` : 'lịch đoàn';
+
+  if (!confirm(`Bạn có chắc chắn muốn xóa ${tourName} khỏi danh sách đăng ký?`)) {
+    return;
+  }
+
+  TOURS_DATA = TOURS_DATA.filter(t => String(t.id) !== String(id) && t.code !== String(id));
+  localStorage.setItem('baotang_tours_data', JSON.stringify(TOURS_DATA));
+  renderTourTable(TOURS_DATA);
+  showToast(`Đã xóa thành công ${tourName}!`, 'info');
+}
+
 function renderTourTable(tours) {
   const tbody = document.getElementById('tourTableBody');
   if (!tbody) return;
@@ -1091,7 +1123,7 @@ function renderTourTable(tours) {
   if (!tours || tours.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
           <i class="fa-solid fa-calendar-days" style="font-size: 2.5rem; margin-bottom: 0.75rem; color: var(--primary-gold); display: block;"></i>
           <strong>Chưa có lịch đoàn tham quan nào được đăng ký.</strong>
           <p style="font-size: 0.85rem; margin-top: 0.25rem;">Nhấn nút "Đăng Ký Lịch Đoàn Mới" phía trên để thêm mới.</p>
@@ -1110,6 +1142,11 @@ function renderTourTable(tours) {
       <td>${t.time}</td>
       <td>${t.guide}</td>
       <td><span class="badge-status badge-warning">${t.status}</span></td>
+      <td>
+        <button type="button" class="btn-danger btn-sm" onclick="deleteTour('${t.id}')">
+          <i class="fa-solid fa-trash-can"></i> Xóa
+        </button>
+      </td>
     </tr>
   `).join('');
 }
