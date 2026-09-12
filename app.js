@@ -683,9 +683,6 @@ function openArtifactModal(id = null) {
       document.getElementById('modalArtCode').value = art.code || '';
       document.getElementById('modalArtTitle').value = art.title || '';
       document.getElementById('modalArtEthnic').value = art.ethnic || '';
-      if (document.getElementById('modalArtLanguageGroup')) {
-        document.getElementById('modalArtLanguageGroup').value = art.languageGroup || 'Kinh - Tày - Thái';
-      }
       document.getElementById('modalArtRegion').value = art.region || 'Vùng núi cao phía Bắc';
       document.getElementById('modalArtMaterial').value = art.material || '';
       document.getElementById('modalArtLocation').value = art.location || 'Kho Bảo Quản 1';
@@ -710,9 +707,6 @@ function openArtifactModal(id = null) {
     document.getElementById('modalArtCode').value = nextCode;
     document.getElementById('modalArtTitle').value = '';
     document.getElementById('modalArtEthnic').value = '';
-    if (document.getElementById('modalArtLanguageGroup')) {
-      document.getElementById('modalArtLanguageGroup').value = 'Kinh - Tày - Thái';
-    }
     document.getElementById('modalArtRegion').value = 'Vùng núi cao phía Bắc';
     document.getElementById('modalArtMaterial').value = '';
     document.getElementById('modalArtLocation').value = 'Kho Bảo Quản 1';
@@ -742,7 +736,6 @@ async function handleSaveArtifact(event) {
   const codeInput = document.getElementById('modalArtCode').value.trim();
   const titleInput = document.getElementById('modalArtTitle').value.trim();
   const ethnicInput = document.getElementById('modalArtEthnic').value.trim();
-  const languageGroupInput = document.getElementById('modalArtLanguageGroup') ? document.getElementById('modalArtLanguageGroup').value : 'Kinh - Tày - Thái';
   const regionInput = document.getElementById('modalArtRegion').value;
   const materialInput = document.getElementById('modalArtMaterial').value.trim();
   const locationInput = document.getElementById('modalArtLocation').value;
@@ -750,7 +743,6 @@ async function handleSaveArtifact(event) {
   const code = codeInput || `HV-${String(ARTIFACTS_DATA.length + 1).padStart(3, '0')}`;
   const title = titleInput || 'Hiện vật mới';
   const ethnic = ethnicInput || 'Chưa xác định';
-  const languageGroup = languageGroupInput || 'Kinh - Tày - Thái';
   const region = regionInput || 'Vùng núi cao phía Bắc';
   const material = materialInput || 'Chưa xác định';
   const location = locationInput || 'Kho Bảo Quản 1';
@@ -783,7 +775,6 @@ async function handleSaveArtifact(event) {
     targetArt.code = code;
     targetArt.title = title;
     targetArt.ethnic = ethnic;
-    targetArt.languageGroup = languageGroup;
     targetArt.region = region;
     targetArt.material = material;
     targetArt.location = location;
@@ -1070,21 +1061,15 @@ function handleSaveTour(event) {
   event.preventDefault();
 
   const tourName = document.getElementById('modalTourName').value.trim();
-  const ward = document.getElementById('modalTourWard') ? document.getElementById('modalTourWard').value.trim() : '';
-  const province = document.getElementById('modalTourProvince') ? document.getElementById('modalTourProvince').value.trim() : '';
   const tourTarget = document.getElementById('modalTourTarget') ? document.getElementById('modalTourTarget').value : 'Du khách';
   const tourSize = document.getElementById('modalTourSize').value;
   const guide = document.getElementById('modalTourGuide').value.trim();
-
-  const fullNameWithLoc = (ward || province) ? `${tourName} (${[ward, province].filter(Boolean).join(', ')})` : tourName;
 
   const randomNum = Math.floor(100 + Math.random() * 900);
   const newTour = {
     id: TOURS_DATA.length + 1,
     code: `#DOAN-${randomNum}`,
-    name: fullNameWithLoc,
-    ward: ward,
-    province: province,
+    name: tourName,
     target: tourTarget,
     size: `${tourSize} Khách`,
     time: 'Hôm nay',
